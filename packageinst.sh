@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd ~
-python -m venv .venv
-source ./.venv/bin/activate
+
+#python3 -m venv .venv
+#source ./.venv/bin/activate
 pip install --upgrade pip
 pip install --upgrade google-api-python-client
 pip install pandas 
