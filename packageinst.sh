@@ -1,10 +1,17 @@
 #!/bin/bash
-sudo pip3 install --upgrade google-api-python-client -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install pandas -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install google-cloud -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install google-cloud-vision -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install --upgrade gtfs-realtime-bindings -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install python-dotenv -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install protobuf3-to-dict -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install --user gtfs-realtime-bindings -t /home/pi/rpi-rgb-led-matrix/bindings/python
-sudo pip3 install --upgrade gtfs-realtime-bindings
+
+cd ~
+python -m venv .venv
+source ./.venv/bin/activate
+pip install --upgrade pip
+pip install --upgrade google-api-python-client
+pip install pandas 
+pip install google-cloud 
+pip install google-cloud-vision
+pip install --upgrade gtfs-realtime-bindings
+pip install python-dotenv 
+pip install protobuf3-to-dict
+pip install --user gtfs-realtime-bindings 
+pip install --upgrade gtfs-realtime-bindings
+pip install RGBMatrixEmulator
+pip install termcolor
