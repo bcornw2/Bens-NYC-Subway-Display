@@ -121,7 +121,7 @@ class GraphicsTest(SampleBase):
                             if line=="N" or line=="R" or line=="Q" or line=="W": bulletcolor = black
 
                             len2=(len(str(dest))*5)
-                            if len2>70:
+                            if len2>88: #length of white line
 
                                 northhvalues[b][0]=10-len2+42
                                 posi2=northhvalues[b][1]
@@ -141,7 +141,7 @@ class GraphicsTest(SampleBase):
 
 
                             for i in range(9):graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0)) #creates black bar beneath bullet/line num
-                            for i in range(90,128): #black block beneath train arrival times
+                            for i in range(95,128): #black block beneath train arrival times
                                    graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
 
                             #BULLETS
@@ -160,15 +160,19 @@ class GraphicsTest(SampleBase):
 
                             # if mins is single digit, it will add a blank space before the number to align it with two-digit ints.
                             if len(str(mins)) < 2:
-                                mins = " " + mins + " mins"
-                            else:
-                                mins = mins + " mins"
+                                mins = " " + mins
 
                             # if the train is 0 minutes away, it will simply say "   Now" instead of " 0 mins"
-                            if train[1] < 1: mins = "   Now"
+                            if train[1] < 1:
+                                mins = "   Now"
 
-                            # write out the minute counts
-                            graphics.DrawText(canvas, font, 92, traincharspacing, color, mins)
+                                # write out the minute counts
+                                graphics.DrawText(canvas, font, 98, traincharspacing, white, mins)
+                            else:
+                                graphics.DrawText(canvas, font, 98, traincharspacing, white, mins)
+                                graphics.DrawText(canvas, font_small, 111, traincharspacing, white, "mins")
+
+
 
 
                             # long cross line to separate Northbound trains and Southbound trains.
@@ -193,7 +197,7 @@ class GraphicsTest(SampleBase):
 
                             #compressing/running the too-long dest names
                             len2=(len(str(dest))*5) #as 5 is the width if pixels per letter, this line shows how wide the destination is.
-                            if len2>70:
+                            if len2>88: #length of white line
                                 southhvalues[b][0]=10-len2+42
                                 posi2=southhvalues[b][1]
                                 if southhvalues[b][1]<=southhvalues[b][0]-20:
@@ -214,7 +218,7 @@ class GraphicsTest(SampleBase):
                             for i in range(9):
                                 graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
                             #black line below mins/arrival times
-                            for i in range(90,128):
+                            for i in range(95,128):
                                     graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
 
                             #Manual bullet icon creation
@@ -230,15 +234,19 @@ class GraphicsTest(SampleBase):
                             # Draw line number on top of bullet
                             graphics.DrawText(canvas, font_small, 3, traincharspacing - 1, bulletcolor, str(train[0]))  # train line
 
-                            #if mins is single digit, it will add a blank space before the number to align it with two-digit ints.
-                            if len(str(mins)) < 2: mins = " " + mins + " mins"
-                            else: mins = mins +" mins"
+                            # if mins is single digit, it will add a blank space before the number to align it with two-digit ints.
+                            if len(str(mins)) < 2:
+                                mins = " " + mins
 
-                            #if the train is 0 minutes away, it will simply say "   Now" instead of " 0 mins"
-                            if train[1] < 1: mins = "   Now"
+                            # if the train is 0 minutes away, it will simply say "   Now" instead of " 0 mins"
+                            if train[1] < 1:
+                                mins = "   Now"
 
-                            #write out the minute counts
-                            graphics.DrawText(canvas, font, 92, traincharspacing, color, mins)
+                                # write out the minute counts
+                                graphics.DrawText(canvas, font, 98, traincharspacing, white, mins)
+                            else:
+                                graphics.DrawText(canvas, font, 98, traincharspacing, white, mins)
+                                graphics.DrawText(canvas, font_small, 111, traincharspacing, white, "mins")
 
                             #increment the counts (traincharspacing means that the next line is always 8 pixels lower than the current
                             traincharspacing+=8

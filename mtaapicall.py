@@ -261,7 +261,7 @@ def rgbformatter(packet, servicedata, stations):
 ## TEMPORARY::
 while True:
     if __name__ == "__main__":
-        stations = ["635", "R20", "L03"] #"these can be changed, use stops.csv in this dir to find your local.
+        stations = ["M12"] #"718", "R09"] #"these can be changed, use stops.csv in this dir to find your local.
         worked = 0
         while worked == 0:
             try:
