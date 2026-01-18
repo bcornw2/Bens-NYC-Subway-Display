@@ -3,7 +3,15 @@
 #### Adapted heavily from the project found here, by TechyTobias:
 - https://github.com/techytobias/NYC-Subway-Display/tree/main
 - This project was forked and modified heavily, and uses RGBMatrixEmulator as the display runtime for testing on computers. The RGBMatrixEmulator project can be found here: https://github.com/ty-porter/RGBMatrixEmulator/tree/main
-- To get this project running, you must install the packages located at the `packageinstsh` list. 
+- To get this project running, you must install the packages located at the `packageinst.sh` list, included.
+#### Main Changes I've Made:
+- Works with the RGBMatrix Emulator
+- Works in a terminal so you can test it out and see logic
+- Significant visual improvements, including using the bullets for the subway displays, cycling different lines, showing the station names, improving the bdf glyph fonts, fixing the train times/minutes display, making the RGB Matrix display modifiable, fixing colors, and more.
+- Fixed existing logic errors
+- Code refactoring (still much to do)
+- Made the code compatible with embeddeds, EPS32 chips, like the Adafruit CircuitPython SAMD41 project from ADABox 16, instead of using a Raspberry Pi.
+- Modified API calls to work with new keyless API that MTA published. 
 #### Capabilities
 - Display times for arriving trains at any NYC subway station
 - Rotate through time displays for multiple stations
@@ -11,28 +19,28 @@
 - [Video of display](https://github.com/techytobias/NYC-Subway-Display/blob/main/V2DisplayVideo.MOV)
 - [Disruptions Screen](https://github.com/techytobias/NYC-Subway-Display/blob/main/V2NewDisruptionsScreenExample.JPG)
 ## Materials
-- Raspberry Pi (Pi 3 Model B or later recommended) with internet access over ethernet or WiFi
-    - Do not overclock it (can cause screen issues)
-- SD Card (8GB Class 10 or better)
-- LED Matrix. I used [this Adafruit one, which is 64 x 32 with a 5mm led spacing](https://www.adafruit.com/product/2277)
-- Adafruit RGB Matrix driver. I used [this one with the RTC](https://www.adafruit.com/product/2345), but you should be able to use the regular one.
-- Adequate power for the display and Pi. [This adapter](https://www.adafruit.com/product/1466) should work great.
-    - It's worth noting that my display is configured with 2A to the hat and 500mA to the Pi over USB. It works using lower brightness, but there is some flicker.
-- Appropriate peripherals (Display, keyboard, mouse, etc) or SSH enabled by default.
+- ~~Raspberry Pi (Pi 3 Model B or later recommended) with internet access over ethernet or WiFi~~
+    - ~~Do not overclock it (can cause screen issues)~~
+- ~~SD Card (8GB Class 10 or better)~~
+- LED Matrix. I used [this Adafruit one, which is 64 x 32 with a 4mm led pitch spacing, daisy chained to another of equal size. ](https://www.adafruit.com/product/658?srsltid=AfmBOorM_mtw3_C3vyolnAtos4wNMRGsRljd9rMFEfhYyB1_Xm_Aphc1)
+- ~~Adafruit RGB Matrix driver. I used [this one with the RTC](https://www.adafruit.com/product/2345), but you should be able to use the regular one.~~
+- Adequate power for the display and SAMD41 M4 chip, using a 5v 10amp power supply for controller, and both matrices combined. [This adapter](https://www.adafruit.com/product/1466) should work great.
+    - ~~t's worth noting that my display is configured with 2A to the hat and 500mA to the Pi over USB. It works using lower brightness, but there is some flicker.~~
+- Appropriate peripherals (Display, keyboard, mouse, etc) or SSH enabled by default.~
 
 ## Before You Begin This Guide
-- Install Raspbian (No desktop environment needed)
-- Keeping the default user "pi" will work best, as that is what's configured in packageinst.sh 
-    - You may still change the default password
-    - If are advanced and you wish to use a different username, modify packageinst.sh for the new paths. 
-- Enable SSH
-- Get an MTA API key [here](https://api.mta.info).
-- Install Python 3 (likely installed by default) and PIP (you likely will need to install) on the Raspberry Pi (For retrieving packages)
-- Follow [this Adafruit guide](https://learn.adafruit.com/adafruit-rgb-matrix-plus-real-time-clock-hat-for-raspberry-pi/driving-matrices) to get the examples running on your display.
-    - You can pick between quality and convenience, both work for the purposes of this guide.
-    - Ensure that you are able to run example 0 (the rotating cube) before continuing.
-    - If the display works for a second and then shuts off, you may not have sufficient power.
-    - If there is severe aliasing or flickering, experiment with different values for --led-gpio-slowdown. I used --led-gpio-slowdown=2
+- ~~Install Raspbian (No desktop environment needed)~~
+- ~~Keeping the default user "pi" will work best, as that is what's configured in packageinst.sh~~ 
+    - ~~You may still change the default password~~
+    - ~~If are advanced and you wish to use a different username, modify packageinst.sh for the new paths.~~ 
+- ~~Enable SSH~~
+- ~~Get an MTA API key [here](https://api.mta.info).~~
+- ~~Install Python 3 (likely installed by default) and PIP (you likely will need to install) on the Raspberry Pi (For retrieving packages)~~
+- ~~Follow [this Adafruit guide](https://learn.adafruit.com/adafruit-rgb-matrix-plus-real-time-clock-hat-for-raspberry-pi/driving-matrices) to get the examples running on your display.~~
+    - ~~You can pick between quality and convenience, both work for the purposes of this guide.~~
+    - ~~Ensure that you are able to run example 0 (the rotating cube) before continuing.~~
+    - ~~If the display works for a second and then shuts off, you may not have sufficient power.~~
+    - ~~If there is severe aliasing or flickering, experiment with different values for --led-gpio-slowdown. I used --led-gpio-slowdown=2~~
 
 ## Creating the display
 - At this point, I'm assuming that you have the rotating cube demo file working. Your file structure should look like /home/pi/rpi-rgb-led-matrix/bindings/python/samples/
