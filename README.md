@@ -1,5 +1,9 @@
 # NYC Subway Time LED Matrix Display
 ## Overview
+#### Adapted heavily from the project found here, by TechyTobias:
+- https://github.com/techytobias/NYC-Subway-Display/tree/main
+- This project was forked and modified heavily, and uses RGBMatrixEmulator as the display runtime for testing on computers. The RGBMatrixEmulator project can be found here: https://github.com/ty-porter/RGBMatrixEmulator/tree/main
+- To get this project running, you must install the packages located at the `packageinstsh` list. 
 #### Capabilities
 - Display times for arriving trains at any NYC subway station
 - Rotate through time displays for multiple stations
