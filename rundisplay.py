@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+import random
 from datetime import datetime
 
 import RGBMatrixEmulator
+from PIL import Image
 
 #CLOCK
 from pytz import timezone
@@ -15,6 +17,7 @@ from RGBMatrixEmulator import graphics
 from sympy.parsing.sympy_parser import null
 
 from samplebase import SampleBase
+
 from subprocess import check_output
 import subprocess
 import csv
@@ -27,8 +30,8 @@ import os
 
 #init
 #wifi
-wifi_ssid = os.getenv("fake_SSID____")
-wifi_password = os.getenv("*************fake)
+wifi_ssid = os.getenv("cxxxx{|::::::::::::::::::::::::/")
+wifi_password = os.getenv("thesword")
 #radio = wifi.radio
 #print(radio.enabled)
 #wifi.radio.connect(wifi_ssid, wifi_password)
@@ -57,9 +60,20 @@ class GraphicsTest(SampleBase):
         self.problemtrains=problemtrains
         self.station_names = []
         for station in stations:
-            print(stops[station])
+            print(f"Stations: {stops[station]}  {str(station)[0]}")
             self.station_names.append(stops[station])
-        print(f"station name___: {self.station_names}")
+
+    def getabrv(self, trainline):
+        abrv = ""
+        if trainline=="4" or trainline=="5" or trainline=="6":
+            abrv = "Lex"
+        elif trainline=="1" or trainline=="2" or trainline=="3":
+            abrv = "1/2/3"
+        elif trainline=="N" or trainline=="R" or trainline == "W" or trainline=="Q":
+            abrv = "Bway"
+
+        return abrv
+
 
     def getcolor(self, trainline):
         white=graphics.Color(255, 255, 255)
@@ -109,9 +123,9 @@ class GraphicsTest(SampleBase):
 
 
         canvas = self.matrix.CreateFrameCanvas()
-        canvas = self.matrix.SwapOnVSync(canvas)
-        canvas.Clear()
-        canvas.Fill(0, 0, 0)
+        #canvas = self.matrix.SwapOnVSync(canvas)
+        #canvas.Clear()
+        #canvas.Fill(0, 0, 0)
 
 
 
@@ -129,36 +143,33 @@ class GraphicsTest(SampleBase):
         yellow=graphics.Color(255, 175, 0)
         bulletcolor = white
         problemtrains=self.problemtrains
-        print(f"problem train: {problemtrains}")
+        print(f"problem Trains (current): {problemtrains}")
         traincolors=[]
 
 
-        self.matrix.SwapOnVSync(canvas)
-        canvas.Clear()
+        #self.matrix.SwapOnVSync(canvas)
+        #canvas.Clear()
 
         statnum = 0
-        print(f"statnum: {statnum}")
         c=0 #what are you????
 
 
         for subpacket in self.packet:
-            print(f"packet:  {str(self.packet)}")
-            print(f"subpacket length:  {len(subpacket)}")
             canvas.Clear()
 
-            print(f"statnum: {statnum}")
+            print(f"Station Call: {statnum} ({self.station_names[statnum]})")
             c+=1
 
 
 
             northhvalues=[[0, 30],[0,30]]
             southhvalues=[[0, 30],[0,30]]
-            t_end = time.time() + 30  #last value controls display time per station in seconds
+            t_end = time.time() + 12  #last value controls display time per station in seconds
             # ^ do it like: if there are three stations (statins[0,1,2], then make the interval variable much higher, so it only shows station name
             #at the end of each "cycle", instead of at the end of each line list. That way it goes like:
             # 456 times, nqrw times, L times, then "14 st-Union Sq", instead of the station name after each card.
             print(f"time.time(): {str(time.time())} | t_end: {str(t_end)}")
-            #print(f"t_end: {str(t_end)}")
+
 
 
             canvas.Clear()
@@ -167,13 +178,14 @@ class GraphicsTest(SampleBase):
             while time.time() < t_end:
                 canvas.Clear()
                 graphics.DrawText(canvas, font_small, 9, 6, white, str(self.station_names[statnum]) + " " + str(line) + " Train")
-                utc = pytz.timezone('UTC')
-                now = utc.localize(datetime.utcnow())
-                nytz =pytz.timezone('America/New_York')
-                local_time = now.astimezone(nytz)
-                formatted_time = local_time.strftime("%H:%M")
+                #utc = pytz.timezone('UTC')
+                #now = utc.localize(datetime.utcnow())
+                #nytz =pytz.timezone('America/New_York')
+                #local_time = now.astimezone(nytz)
+                now = datetime.now()
+                formatted_time = now.strftime("%H:%M")
                 graphics.DrawText(canvas, font_small, 107, 6, yellow, formatted_time)
-                #print(f"statnum: {statnum}")
+
                 i = 0
                 b = 0
 
@@ -183,7 +195,6 @@ class GraphicsTest(SampleBase):
                     line = str(train[0])
                     mins = str(train[1])
                     dest = str(stops[train[2]])
-                   # print(train)
 
                     if train[2][3] == "N":
                         if b<2:
@@ -196,7 +207,7 @@ class GraphicsTest(SampleBase):
 
 
                             len2=(len(str(dest))*5)
-                            if len2>88: #length of free black space between the bullet/arrows and the times.
+                            if len2>80: #length of free black space between the bullet/arrows and the times.
 
                                 northhvalues[b][0]=10-len2+42
                                 posi2=northhvalues[b][1]
@@ -205,36 +216,37 @@ class GraphicsTest(SampleBase):
                                     posi2=northhvalues[b][1]
                                 if posi2<=northhvalues[b][0] and posi2>=northhvalues[b][0]-20:
                                     posi2=northhvalues[b][0]
-                                if northhvalues[b][1]>=17:
-                                    posi2=17 #= x coords
+                                if northhvalues[b][1]>=15:
+                                    posi2=15 #= x coords
                             else:
-                                posi2=10+7
+                                posi2=15
 
-                            time.sleep(0.02)
+                                ## POSSIBLY: add "framerate_fraction=10" to the canvas once its running on metal? Its a utility not finihsed for emulator.
+
+
                             graphics.DrawText(canvas, font, posi2, traincharspacing, color, str(stops[train[2]])) # train destination scroll
+                            time.sleep(0.02)
 
-
-
-                            for i in range(16):graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0)) #creates black bar beneath bullet/line num
+                            for i in range(14):graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0)) #creates black bar beneath bullet/line num
                             for i in range(95,128): #black block beneath train arrival times
                                    graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
 
                             #ARROW GRAPHICS (range(8,14)
-                            graphics.DrawLine(canvas, 9, 9, 13, 13, graphics.Color(255, 255, 255))
+                            graphics.DrawLine(canvas, 9, 9, 12, 12, graphics.Color(255, 255, 255))
                             canvas.SetPixel(10, 9, 255, 255, 255)
                             canvas.SetPixel(11, 9, 255, 255, 255)
-                            canvas.SetPixel(12, 9, 255, 255, 255)
+                            #canvas.SetPixel(12, 9, 255, 255, 255)
                             canvas.SetPixel(9, 10, 255, 255, 255)
                             canvas.SetPixel(9, 11, 255, 255, 255)
-                            canvas.SetPixel(9, 12, 255, 255, 255)
+                            #canvas.SetPixel(9, 12, 255, 255, 255)
 
-                            graphics.DrawLine(canvas, 9, 9+8, 13, 13+8, graphics.Color(255, 255, 255))
+                            graphics.DrawLine(canvas, 9, 9+8, 12, 13+7, graphics.Color(255, 255, 255))
                             canvas.SetPixel(10, 9+8, 255, 255, 255)
                             canvas.SetPixel(11, 9+8, 255, 255, 255)
-                            canvas.SetPixel(12, 9+8, 255, 255, 255)
+                            #canvas.SetPixel(12, 9+8, 255, 255, 255)
                             canvas.SetPixel(9, 10+8, 255, 255, 255)
                             canvas.SetPixel(9, 11+8, 255, 255, 255)
-                            canvas.SetPixel(9, 12+8, 255, 255, 255)
+                            #canvas.SetPixel(9, 12+8, 255, 255, 255)
 
 
 
@@ -299,7 +311,7 @@ class GraphicsTest(SampleBase):
 
                             #compressing/running the too-long dest names
                             len2=(len(str(dest))*5) #as 5 is the width if pixels per letter, this line shows how wide the destination is.
-                            if len2>88: #length of white line
+                            if len2>80: #length of white line
                                 southhvalues[b][0]=10-len2+42
                                 posi2=southhvalues[b][1]
                                 if southhvalues[b][1]<=southhvalues[b][0]-20:
@@ -307,31 +319,30 @@ class GraphicsTest(SampleBase):
                                     posi2=southhvalues[b][1]
                                 if posi2<=southhvalues[b][0] and posi2>=southhvalues[b][0]-20:
                                     posi2=southhvalues[b][0]
-                                    #print(f"posi2: {str(posi2)}")
-                                if southhvalues[b][1]>=10:
-                                    posi2=10+7
+                                if southhvalues[b][1]>=15:
+                                    posi2=15
                             else:
-                                posi2=10+7
+                                posi2=15
 
                             #train destination
                             graphics.DrawText(canvas, font, posi2, traincharspacing, color, dest)
-                            time.sleep(0.01)
+                            time.sleep(0.02)
 
                             #black line below bullets
-                            for i in range(16):
+                            for i in range(14):
                                 graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
                             #black line below mins/arrival times
                             for i in range(95,128):
                                     graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
 
                             #ARROW
-                            graphics.DrawLine(canvas, 9, 9 + 8 + 8, 13, 13 + 8 + 8, graphics.Color(255, 255, 255))
-                            canvas.SetPixel(10, 9 + 8 + 8+4, 255, 255, 255)
-                            canvas.SetPixel(11, 9 + 8 + 8+4, 255, 255, 255)
-                            canvas.SetPixel(12, 9 + 8 + 8+4, 255, 255, 255)
-                            canvas.SetPixel(9+4, 10 + 8 + 8, 255, 255, 255)
-                            canvas.SetPixel(9+4, 11 + 8 + 8, 255, 255, 255)
-                            canvas.SetPixel(9+4, 12 + 8 + 8, 255, 255, 255)
+                            graphics.DrawLine(canvas, 9, 9 + 8 + 8, 12, 13 + 8 + 7, graphics.Color(255, 255, 255))
+                            canvas.SetPixel(10, 9 + 8 + 8+3, 255, 255, 255)
+                            canvas.SetPixel(11, 9 + 8 + 8+3, 255, 255, 255)
+                            #canvas.SetPixel(12, 9 + 8 + 8+3, 255, 255, 255)
+                            canvas.SetPixel(9+3, 10 + 8 + 8, 255, 255, 255)
+                            canvas.SetPixel(9+3, 11 + 8 + 8, 255, 255, 255)
+                            #canvas.SetPixel(9+3, 12 + 8 + 8, 255, 255, 255)
 
                             #Manual bullet icon creation
                             graphics.DrawCircle(canvas, 4, traincharspacing - 4, 3, color) #bullet
@@ -370,10 +381,9 @@ class GraphicsTest(SampleBase):
                             b+=1
 
                 time.sleep(0.01) #this makes the running text easier to read.
-                canvas = self.matrix.SwapOnVSync(canvas)
+                canvas = self.matrix.SwapOnVSync(canvas) #turning this off makes the whole thing black forever? Weird.
                 i +=1
             statnum+=1
-            print(f"statnum:{statnum}")
 
             if c<3: #wtf is "c"??
                 print("sleeping...")
@@ -382,7 +392,6 @@ class GraphicsTest(SampleBase):
             elif c==3:
                 canvas.Clear()
                 graphics.DrawText(canvas, font, 0, 8, white, "Disruptions:")
-                print("servicedata showing")
                 charspace=0
                 vertspace=17
                 trainnum=1
@@ -403,12 +412,5 @@ class GraphicsTest(SampleBase):
                 canvas = self.matrix.SwapOnVSync(canvas)
             #else:
             print("fetching data")
-            #statnum += 1
-            canvas = self.matrix.SwapOnVSync(canvas)
-
-            #print(f"stationname: {self.stationname}")
-            #graphics.DrawText(canvas, font, 12, 12, white, self.stationname)
-
-            #print("reached this point")
-            #canvas.Clear()
             #canvas = self.matrix.SwapOnVSync(canvas)
+

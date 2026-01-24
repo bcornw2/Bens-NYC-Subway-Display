@@ -96,19 +96,15 @@ def totalstationtimes(stationlist):
     print("datagot")
     for station in stationlist:
         stations = [(station + "N"), (station + "S")]
-        print(str(stations))
         newdata = []
         d = 0
         for station1 in stations:
             arrd = gettimes(data, station1)
-            # print(f"arrd[{d}]: {arrd[d]}")
             d += 1
             for element in arrd:
                 newdata.append(element)
         newdata.sort(key=lambda row: (row[1], row[0]), reverse=False)
         finaldata.append(newdata)
-    # print("FINAL DATA:  ")
-    print(f"finaldata[1]: {finaldata[0]}")
     return finaldata
 
 
@@ -261,7 +257,7 @@ def rgbformatter(packet, servicedata, stations):
 ## TEMPORARY::
 while True:
     if __name__ == "__main__":
-        stations = ["M12", "L13", "G31"] #["A32", "D20"] #W 4th St
+        stations = ["635", "R20", "L03"] #["A32", "D20"] #W 4th St
                                 # #for some reason, L12 and L13 don't work? No packet data?
                             #"R16", "127", "725", "901"] TIMES SQUARE
                         # #"M12", "G31", "L13"] SPENCER AND TIFFS HOUSE
@@ -282,6 +278,7 @@ while True:
                         timegroup.remove(singletime)
 
             graphics_test = GraphicsTest(packet, servicedata, stations, procservicedata())
+            print(f"Just finished)")
 
             if (not graphics_test.process()):
                 print("isrunning")
