@@ -1,28 +1,66 @@
 #!/usr/bin/env python
+from datetime import datetime
+
 import RGBMatrixEmulator
+
+#CLOCK
+from pytz import timezone
+import adafruit_ntp
+
+#Adafruit
+import adafruit_connection_manager
 
 #import rgbmatrix
 from RGBMatrixEmulator import graphics
+from sympy.parsing.sympy_parser import null
+
 from samplebase import SampleBase
 from subprocess import check_output
 import subprocess
 import csv
 import time
+#import wifi
 import os
+
+##create a cron job that does "ntpd -qq" or any other ntp time sync for EST.
+
+
+#init
+#wifi
+wifi_ssid = os.getenv("fake_SSID____")
+wifi_password = os.getenv("*************fake)
+#radio = wifi.radio
+#print(radio.enabled)
+#wifi.radio.connect(wifi_ssid, wifi_password)
+
+#pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
+#ntp = adafruit_ntp.NTP(pool, tz_offset=0, cache_seconds=3600)
+#now = ntp.datetime
+
+
+
 stops = {}
 with open("stops.csv", 'r') as file:
     csvreader = csv.reader(file)
     header = next(csvreader)
+    i=0
     for row in csvreader:
+        i+=1
         stops.update({row[0]: row[1]})
 
 class GraphicsTest(SampleBase):
-    def __init__(self, packet, servicedata, stations, *args, **kwargs):
+    def __init__(self, packet, servicedata, stations, problemtrains, *args, **kwargs):
         super(GraphicsTest, self).__init__(*args, **kwargs)
         self.packet=packet
         self.servicedata=servicedata
         self.stations=stations
-        print(f"station: {stations}")
+        self.problemtrains=problemtrains
+        self.station_names = []
+        for station in stations:
+            print(stops[station])
+            self.station_names.append(stops[station])
+        print(f"station name___: {self.station_names}")
+
     def getcolor(self, trainline):
         white=graphics.Color(255, 255, 255)
         seventh = graphics.Color(255, 0, 0)
@@ -33,7 +71,7 @@ class GraphicsTest(SampleBase):
         jamaica=graphics.Color(165,42,42)
         nassau=graphics.Color(107,187,78)
         flushing=graphics.Color(185,52,170)
-        atlantic=graphics.Color(165,155,155)
+        atlantic=graphics.Color(167,169,172)
         black = graphics.Color(0, 0, 0)
         white = graphics.Color(255, 255, 255)
         blue = graphics.Color(0, 0, 255)
@@ -52,7 +90,6 @@ class GraphicsTest(SampleBase):
             color=sixth
         elif trainline=="N" or trainline=="Q" or trainline=="R" or trainline=="W":
             color=bway
-            bulletcolor = black
         elif trainline=="G":
             color=nassau
         elif trainline=="L":
@@ -70,7 +107,11 @@ class GraphicsTest(SampleBase):
         #options.parallel = 1
         #options.hardware_mapping = 'regular'
 
+
         canvas = self.matrix.CreateFrameCanvas()
+        canvas = self.matrix.SwapOnVSync(canvas)
+        canvas.Clear()
+        canvas.Fill(0, 0, 0)
 
 
 
@@ -79,49 +120,83 @@ class GraphicsTest(SampleBase):
         font.LoadFont("fonts/6x10.bdf") ##!! Change to 6x10.bdf,I think. Test this out - bcc
         font_small = graphics.Font()
         font_small.LoadFont("fonts/4x6.bdf")
+        font_big = graphics.Font()
+        font_big.LoadFont("fonts/7x13B.bdf")
         black= graphics.Color(0, 0, 0)
         white=graphics.Color(255, 255, 255)
         blue=graphics.Color(0, 0, 255)
+        red=graphics.Color(255, 0, 0)
+        yellow=graphics.Color(255, 175, 0)
         bulletcolor = white
+        problemtrains=self.problemtrains
+        print(f"problem train: {problemtrains}")
+        traincolors=[]
 
+
+        self.matrix.SwapOnVSync(canvas)
         canvas.Clear()
-        #initialize w station name
-        graphics.DrawText(canvas, font, 1, 1, white, stops[self.stations[0]])
-        time.sleep(2)
-        canvas.Clear()
-        d=0
+
+        statnum = 0
+        print(f"statnum: {statnum}")
         c=0 #what are you????
+
+
         for subpacket in self.packet:
+            print(f"packet:  {str(self.packet)}")
+            print(f"subpacket length:  {len(subpacket)}")
+            canvas.Clear()
+
+            print(f"statnum: {statnum}")
             c+=1
-            print(f"c count: {str(c)}")
-            print(f"subpacket[c]:  {str(subpacket)}")
-            print(f"Station:  {stops[self.stations[0]]}")
 
-            #canvas.fillCircle(16, 16, 6, canvas.Color(0,0, 255))
 
-            pos = 14
-            posi2=14
+
             northhvalues=[[0, 30],[0,30]]
             southhvalues=[[0, 30],[0,30]]
-            t_end = time.time() + 30  #last values controls display time per station in seconds
+            t_end = time.time() + 30  #last value controls display time per station in seconds
+            # ^ do it like: if there are three stations (statins[0,1,2], then make the interval variable much higher, so it only shows station name
+            #at the end of each "cycle", instead of at the end of each line list. That way it goes like:
+            # 456 times, nqrw times, L times, then "14 st-Union Sq", instead of the station name after each card.
+            print(f"time.time(): {str(time.time())} | t_end: {str(t_end)}")
             #print(f"t_end: {str(t_end)}")
-            #print(f"time.time(): {str(time.time())} ")
+
+
+            canvas.Clear()
+            line = ""
+
             while time.time() < t_end:
                 canvas.Clear()
-                traincharspacing=7
-                b=0
+                graphics.DrawText(canvas, font_small, 9, 6, white, str(self.station_names[statnum]) + " " + str(line) + " Train")
+                utc = pytz.timezone('UTC')
+                now = utc.localize(datetime.utcnow())
+                nytz =pytz.timezone('America/New_York')
+                local_time = now.astimezone(nytz)
+                formatted_time = local_time.strftime("%H:%M")
+                graphics.DrawText(canvas, font_small, 107, 6, yellow, formatted_time)
+                #print(f"statnum: {statnum}")
+                i = 0
+                b = 0
+
+                traincharspacing=7+8 # The Vertical spacing for characters.
+
                 for train in subpacket:
                     line = str(train[0])
-                    dest = str(stops[train[2]])
                     mins = str(train[1])
+                    dest = str(stops[train[2]])
+                   # print(train)
+
                     if train[2][3] == "N":
                         if b<2:
                             color=self.getcolor(line)
+                            traincolors.append(color)
                             bulletcolor = white
                             if line=="N" or line=="R" or line=="Q" or line=="W": bulletcolor = black
+                            posi2=17
+
+
 
                             len2=(len(str(dest))*5)
-                            if len2>88: #length of white line
+                            if len2>88: #length of free black space between the bullet/arrows and the times.
 
                                 northhvalues[b][0]=10-len2+42
                                 posi2=northhvalues[b][1]
@@ -130,19 +205,38 @@ class GraphicsTest(SampleBase):
                                     posi2=northhvalues[b][1]
                                 if posi2<=northhvalues[b][0] and posi2>=northhvalues[b][0]-20:
                                     posi2=northhvalues[b][0]
-                                if northhvalues[b][1]>=10:
-                                    posi2=10
+                                if northhvalues[b][1]>=17:
+                                    posi2=17 #= x coords
                             else:
-                                posi2=10
+                                posi2=10+7
 
-                            #time.sleep(0.5)
-                            graphics.DrawText(canvas, font, posi2, traincharspacing, color, str(stops[train[2]])) # train destination
-                            time.sleep(0.05)
+                            time.sleep(0.02)
+                            graphics.DrawText(canvas, font, posi2, traincharspacing, color, str(stops[train[2]])) # train destination scroll
 
 
-                            for i in range(9):graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0)) #creates black bar beneath bullet/line num
+
+                            for i in range(16):graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0)) #creates black bar beneath bullet/line num
                             for i in range(95,128): #black block beneath train arrival times
                                    graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
+
+                            #ARROW GRAPHICS (range(8,14)
+                            graphics.DrawLine(canvas, 9, 9, 13, 13, graphics.Color(255, 255, 255))
+                            canvas.SetPixel(10, 9, 255, 255, 255)
+                            canvas.SetPixel(11, 9, 255, 255, 255)
+                            canvas.SetPixel(12, 9, 255, 255, 255)
+                            canvas.SetPixel(9, 10, 255, 255, 255)
+                            canvas.SetPixel(9, 11, 255, 255, 255)
+                            canvas.SetPixel(9, 12, 255, 255, 255)
+
+                            graphics.DrawLine(canvas, 9, 9+8, 13, 13+8, graphics.Color(255, 255, 255))
+                            canvas.SetPixel(10, 9+8, 255, 255, 255)
+                            canvas.SetPixel(11, 9+8, 255, 255, 255)
+                            canvas.SetPixel(12, 9+8, 255, 255, 255)
+                            canvas.SetPixel(9, 10+8, 255, 255, 255)
+                            canvas.SetPixel(9, 11+8, 255, 255, 255)
+                            canvas.SetPixel(9, 12+8, 255, 255, 255)
+
+
 
                             #BULLETS
                             # Manual bullet icon creation
@@ -155,7 +249,13 @@ class GraphicsTest(SampleBase):
                             canvas.SetPixel(5, traincharspacing - 3, color.red, color.green, color.blue)  # fill
                             canvas.SetPixel(4, traincharspacing - 4, color.red, color.green, color.blue)  # fill
                             canvas.SetPixel(4, traincharspacing - 4, color.red, color.green, color.blue)  # fill
-                            # Draw line number on top of bullet
+
+
+                            # Draw line letter/number on top of bullet
+                            if line in problemtrains:
+                                bulletcolor = red #this makes the letter of the bullet RED if the line is facing delays or outages
+                                if line=="1" or line=="2" or line=="3":
+                                    bulletcolor=yellow #since the 1/2/3 lines are already red, this makes the bullet color yellow, instead of red (outage) or white (normal)
                             graphics.DrawText(canvas, font_small, 3, traincharspacing - 1, bulletcolor, line)  # train line on top of bullet
 
                             # if mins is single digit, it will add a blank space before the number to align it with two-digit ints.
@@ -164,7 +264,7 @@ class GraphicsTest(SampleBase):
 
                             # if the train is 0 minutes away, it will simply say "   Now" instead of " 0 mins"
                             if train[1] < 1:
-                                mins = "   Now"
+                                mins = "  Now"
 
                                 # write out the minute counts
                                 graphics.DrawText(canvas, font, 98, traincharspacing, white, mins)
@@ -176,24 +276,26 @@ class GraphicsTest(SampleBase):
 
 
                             # long cross line to separate Northbound trains and Southbound trains.
-                            graphics.DrawLine(canvas, 0, 16, 128, 16, white )
+                            #graphics.DrawLine(canvas, 9, 16+7, 96, 16+7, white )
 
                             traincharspacing+=8
                             northhvalues[b][1]-=1
                             b+=1
                             c+=1 #still not sure what "c" does.
 
-                traincharspacing=23
+                traincharspacing=23+7+1
                 b=0
+                i+=1
                 #Southbound trains on bottom (why can't this be in the above loop? It's practically identical?)
                 for train in subpacket:
                     line = str(train[0])
                     dest = str(stops[train[2]])
                     mins = str(train[1])
                     if train[2][3] == "S":
-                        if b<2:
+                        if b<1:
                             #fetch bullet/line color
                             color=self.getcolor(line)
+                            bulletcolor=white
 
                             #compressing/running the too-long dest names
                             len2=(len(str(dest))*5) #as 5 is the width if pixels per letter, this line shows how wide the destination is.
@@ -207,19 +309,29 @@ class GraphicsTest(SampleBase):
                                     posi2=southhvalues[b][0]
                                     #print(f"posi2: {str(posi2)}")
                                 if southhvalues[b][1]>=10:
-                                    posi2=10
+                                    posi2=10+7
                             else:
-                                posi2=10
+                                posi2=10+7
 
                             #train destination
                             graphics.DrawText(canvas, font, posi2, traincharspacing, color, dest)
+                            time.sleep(0.01)
 
                             #black line below bullets
-                            for i in range(9):
+                            for i in range(16):
                                 graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
                             #black line below mins/arrival times
                             for i in range(95,128):
                                     graphics.DrawLine(canvas, i, traincharspacing-7, i, traincharspacing, graphics.Color(0, 0, 0))
+
+                            #ARROW
+                            graphics.DrawLine(canvas, 9, 9 + 8 + 8, 13, 13 + 8 + 8, graphics.Color(255, 255, 255))
+                            canvas.SetPixel(10, 9 + 8 + 8+4, 255, 255, 255)
+                            canvas.SetPixel(11, 9 + 8 + 8+4, 255, 255, 255)
+                            canvas.SetPixel(12, 9 + 8 + 8+4, 255, 255, 255)
+                            canvas.SetPixel(9+4, 10 + 8 + 8, 255, 255, 255)
+                            canvas.SetPixel(9+4, 11 + 8 + 8, 255, 255, 255)
+                            canvas.SetPixel(9+4, 12 + 8 + 8, 255, 255, 255)
 
                             #Manual bullet icon creation
                             graphics.DrawCircle(canvas, 4, traincharspacing - 4, 3, color) #bullet
@@ -232,6 +344,10 @@ class GraphicsTest(SampleBase):
                             canvas.SetPixel(4, traincharspacing - 4, color.red, color.green, color.blue)  # fill
                             canvas.SetPixel(4, traincharspacing - 4, color.red, color.green, color.blue)  # fill
                             # Draw line number on top of bullet
+                            if line in problemtrains:
+                                bulletcolor = red
+                                if line=="1" or line=="2" or line=="3":
+                                    bulletcolor=yellow
                             graphics.DrawText(canvas, font_small, 3, traincharspacing - 1, bulletcolor, str(train[0]))  # train line
 
                             # if mins is single digit, it will add a blank space before the number to align it with two-digit ints.
@@ -240,7 +356,7 @@ class GraphicsTest(SampleBase):
 
                             # if the train is 0 minutes away, it will simply say "   Now" instead of " 0 mins"
                             if train[1] < 1:
-                                mins = "   Now"
+                                mins = "  Now"
 
                                 # write out the minute counts
                                 graphics.DrawText(canvas, font, 98, traincharspacing, white, mins)
@@ -253,34 +369,46 @@ class GraphicsTest(SampleBase):
                             southhvalues[b][1]-=1
                             b+=1
 
-                time.sleep(0.05) #this makes the runnign text easier to read.
+                time.sleep(0.01) #this makes the running text easier to read.
                 canvas = self.matrix.SwapOnVSync(canvas)
+                i +=1
+            statnum+=1
+            print(f"statnum:{statnum}")
 
             if c<3: #wtf is "c"??
                 print("sleeping...")
 
-                #THIS IS train disruption functionality that I don't care about.
-#            elif c==3:
-#                canvas.Clear()
-#                graphics.DrawText(canvas, font, 0, 8, white, "Disruptions:")
-#                print("servicedata showing")
-#                charspace=0
-#                vertspace=17
-#                trainnum=1
-#                for problemtrain in self.servicedata:
-#                    color=self.getcolor(problemtrain)
-#                    graphics.DrawText(canvas, font, charspace, vertspace, color, problemtrain)
-#                    charspace +=7
-#                    trainnum+=1
-#                    if trainnum >= 10:
-#                        vertspace+=8
-#                        trainnum=1
-#                        charspace=0
-#                    #Add ip to disruptions screen
-#                    ipaddr=str(check_output(['hostname', '-I']))[9:]
-#
-#                    ipaddr2="IP: " + ipaddr[:-3]
-#                    graphics.DrawText(canvas, font, 0, 32, graphics.Color(10,169,172), ipaddr2)
- #               canvas = self.matrix.SwapOnVSync(canvas)
-            else:
-                print("fetching data")
+            #THIS IS train disruption functionality that I don't care about.
+            elif c==3:
+                canvas.Clear()
+                graphics.DrawText(canvas, font, 0, 8, white, "Disruptions:")
+                print("servicedata showing")
+                charspace=0
+                vertspace=17
+                trainnum=1
+                for problemtrain in self.servicedata:
+                    color=self.getcolor(problemtrain)
+                    graphics.DrawText(canvas, font, charspace, vertspace, color, problemtrain)
+                    charspace +=7
+                    trainnum+=1
+                    if trainnum >= 10:
+                        vertspace+=8
+                        trainnum=1
+                        charspace=0
+                    #Add ip to disruptions screen
+                    ipaddr=str(check_output(['hostname', '-I']))[9:]
+
+                    ipaddr2="IP: " + ipaddr[:-3]
+                    graphics.DrawText(canvas, font, 0, 32, graphics.Color(10,169,172), ipaddr2)
+                canvas = self.matrix.SwapOnVSync(canvas)
+            #else:
+            print("fetching data")
+            #statnum += 1
+            canvas = self.matrix.SwapOnVSync(canvas)
+
+            #print(f"stationname: {self.stationname}")
+            #graphics.DrawText(canvas, font, 12, 12, white, self.stationname)
+
+            #print("reached this point")
+            #canvas.Clear()
+            #canvas = self.matrix.SwapOnVSync(canvas)

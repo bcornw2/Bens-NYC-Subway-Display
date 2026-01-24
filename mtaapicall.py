@@ -147,7 +147,7 @@ def procservicedata():
     if len(problemtrains) == 0:
         problemtrains = ["None"]
     problemtrains.sort()
-    print(problemtrains)
+    print(f"Problem trains: {problemtrains}")
     return problemtrains
 
 
@@ -261,7 +261,13 @@ def rgbformatter(packet, servicedata, stations):
 ## TEMPORARY::
 while True:
     if __name__ == "__main__":
-        stations = ["M12"] #"718", "R09"] #"these can be changed, use stops.csv in this dir to find your local.
+        stations = ["M12", "L13", "G31"] #["A32", "D20"] #W 4th St
+                                # #for some reason, L12 and L13 don't work? No packet data?
+                            #"R16", "127", "725", "901"] TIMES SQUARE
+                        # #"M12", "G31", "L13"] SPENCER AND TIFFS HOUSE
+                         #"718", "R09"] #QUEENSBORO PLAZA
+        #                  #["635","R20","L03"] Union Square
+        #                   #"these can be changed, use stops.csv in this dir to find your local.
         worked = 0
         while worked == 0:
             try:
@@ -275,7 +281,7 @@ while True:
                     if singletime[1] < 2:
                         timegroup.remove(singletime)
 
-            graphics_test = GraphicsTest(packet, servicedata, stations)
+            graphics_test = GraphicsTest(packet, servicedata, stations, procservicedata())
 
             if (not graphics_test.process()):
                 print("isrunning")
@@ -299,7 +305,7 @@ while True:
     terminalformatter(packet, servicedata, stations)
     # rgbformatter(packet, servicedata, stations)
 
-    graphics_test = rundisplay.GraphicsTest(packet, servicedata, stations)
+    graphics_test = rundisplay.GraphicsTest(packet, servicedata, stations, procservicedata())
 
     if (not graphics_test.process()):
         print("is running")
