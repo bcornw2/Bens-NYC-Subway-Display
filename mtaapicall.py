@@ -1,4 +1,8 @@
+import datetime
+from sched import scheduler
+
 import google.transit
+import schedule
 from google.transit import gtfs_realtime_pb2
 import requests
 import time  # imports module for Epoch/GMT time conversion
@@ -9,14 +13,15 @@ import csv
 from termcolor import colored, cprint
 
 import rundisplay
+from easteregg import EasterEgg
 from rundisplay import GraphicsTest
 
 from RGBMatrixEmulator import graphics
 from rundisplay import GraphicsTest
+import easteregg
 
 
 def getdata():
-    print("getdata()")
     realtime_data1 = []
     # old_links=["https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace","https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm", "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs"]
     feedurls = [
@@ -29,20 +34,15 @@ def getdata():
         "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs"  # , #123 456 7 S
         # "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si" #SIR
     ]
-    print(f"feedurls: {feedurls}")
-    # print(f"Active data sources: {str(feedurls.rsplit("-",1))}")
+
     for link in feedurls:
-        # print(link)
         feed = gtfs_realtime_pb2.FeedMessage()
         response = requests.get(link)
         feed.ParseFromString(response.content)
         subway_feed = protobuf_to_dict(feed)  # subway_feed is a dictionary
         realtime_data = subway_feed['entity']  # train_data is a list
-        # print(f"realtime_data: {realtime_data}")
         for element in realtime_data:
             realtime_data1.append(element)
-            # print(f"element: {element}")
-    # print("realtime_data1: "+str(realtime_data1))
     return realtime_data1
 
 
@@ -57,7 +57,6 @@ def gettimes(data, station):
 def station_time_lookup(train_data, station):
     ctimes = []
     for trains in train_data:  # trains are dictionaries
-        # print(f"trains: {trains}")
         if trains.get('trip_update', False) != False:
             unique_train_schedule = trains['trip_update']  # train_schedule is a dictionary with trip
             try:
@@ -86,9 +85,8 @@ def totalstationtimes(stationlist):
     finaldata = []
     data = []
     try:
-        print("Getting data...")
+        print("   Fetching data...")
         data = getdata()
-        print(data[1])
     except:
         print("datafail")
         time.sleep(30)
@@ -119,8 +117,6 @@ def getservicedata():
         realtime_data = subway_feed['entity']  # train_data is a list
         for element in realtime_data:
             realtime_data1.append(element)
-
-    ##print(realtime_data1)
     return realtime_data1
 
 
@@ -147,10 +143,6 @@ def procservicedata():
     return problemtrains
 
 
-# print(totalstationtimes(["232", "A41"]))
-print("procservicedata(): " + str(procservicedata()))
-
-
 def terminalformatter(packet, servicedata, stations):
     # get human-readable stops
     # color formatter
@@ -162,13 +154,8 @@ def terminalformatter(packet, servicedata, stations):
         header = next(csvreader)
         for row in csvreader:
             stops.update({row[0]: row[1]})
-        # print("stops.: " + str(stops))
-    print(f"Station:  {stops[stations[0]]}")
     bulletcolor = "white"
     for subpacket in packet:
-
-        # print(f"packet: {packet}")
-        print(f"subpacket: {subpacket}")
         c += 1
         t_end = time.time() + 1 * 100
         b = 0
@@ -252,12 +239,17 @@ def rgbformatter(packet, servicedata, stations):
 
                     print(f"({line})  | {dest:<25}    {mins:>15}")
                     b += 1
-
+def eastereggfunc():
+    easteregg()
+    for i in range(14):
+        print("lol")
 
 ## TEMPORARY::
 while True:
     if __name__ == "__main__":
-        stations = ["635", "R20", "L03"] #["A32", "D20"] #W 4th St
+        now = datetime.datetime.now()
+        print(f"now: {now.hour}:{now.minute}:{now.second}")
+        stations = ["M12"] #, "G31", "L13"] #["A32", "D20"] #W 4th St
                                 # #for some reason, L12 and L13 don't work? No packet data?
                             #"R16", "127", "725", "901"] TIMES SQUARE
                         # #"M12", "G31", "L13"] SPENCER AND TIFFS HOUSE
@@ -266,6 +258,8 @@ while True:
         #                   #"these can be changed, use stops.csv in this dir to find your local.
         worked = 0
         while worked == 0:
+
+
             try:
                 packet = totalstationtimes(stations)  # (14 st-Union Square N/S, -- "423", "A41", "232"]) <-- boroguh hall, Jay St Metrotech, borough hall again?
                 servicedata = procservicedata()
@@ -277,33 +271,28 @@ while True:
                     if singletime[1] < 2:
                         timegroup.remove(singletime)
 
-            graphics_test = GraphicsTest(packet, servicedata, stations, procservicedata())
-            print(f"Just finished)")
 
-            if (not graphics_test.process()):
-                print("isrunning")
+
+
+
+
+
+            graphics_test = GraphicsTest(packet, servicedata, stations, procservicedata())
+            print(f"Just finished.")
+            if not graphics_test.process():
+                print("is running")
                 graphics_test.print_help()
 
-    # while worked == 0:
-    # try:
-    #    packet = totalstationtimes(["636", "R20"]) #(14 st-Union Square N/S, -- "423", "A41", "232"]) <-- boroguh hall, Jay St Metrotech, borough hall again?
-    #    servicedata = procservicedata()
-    #    worked = 1
-    # except:
-    # print("rebooting in 30 seconds")
-    # time.sleep(30)
-    # subprocess.Popen('sudo reboot -n', shell=True)
+            #easter egg schedule
+            easter_egg = EasterEgg()
+            if now.hour == 22 and 1 <= now.minute <= 59:
+                print(f"now.hour: {now.hour}, now.minute: {now.minute}")
+                if not easter_egg.process():
+                    print("In here")
+                    easter_egg.print_help()
+
+
     for timegroup in packet:
         for singletime in timegroup:
             if singletime[1] < 2:
                 timegroup.remove(singletime)
-
-    # graphics_test = print("PRINTING: ")
-    terminalformatter(packet, servicedata, stations)
-    # rgbformatter(packet, servicedata, stations)
-
-    graphics_test = rundisplay.GraphicsTest(packet, servicedata, stations, procservicedata())
-
-    if (not graphics_test.process()):
-        print("is running")
-        graphics_test.print_help()

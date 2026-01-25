@@ -16,6 +16,8 @@ import adafruit_connection_manager
 from RGBMatrixEmulator import graphics
 from sympy.parsing.sympy_parser import null
 
+import easteregg
+from easteregg import EasterEgg
 from samplebase import SampleBase
 
 from subprocess import check_output
@@ -62,18 +64,6 @@ class GraphicsTest(SampleBase):
         for station in stations:
             print(f"Stations: {stops[station]}  {str(station)[0]}")
             self.station_names.append(stops[station])
-
-    def getabrv(self, trainline):
-        abrv = ""
-        if trainline=="4" or trainline=="5" or trainline=="6":
-            abrv = "Lex"
-        elif trainline=="1" or trainline=="2" or trainline=="3":
-            abrv = "1/2/3"
-        elif trainline=="N" or trainline=="R" or trainline == "W" or trainline=="Q":
-            abrv = "Bway"
-
-        return abrv
-
 
     def getcolor(self, trainline):
         white=graphics.Color(255, 255, 255)
@@ -124,8 +114,7 @@ class GraphicsTest(SampleBase):
 
         canvas = self.matrix.CreateFrameCanvas()
         #canvas = self.matrix.SwapOnVSync(canvas)
-        #canvas.Clear()
-        #canvas.Fill(0, 0, 0)
+
 
 
 
@@ -147,6 +136,12 @@ class GraphicsTest(SampleBase):
         traincolors=[]
 
 
+
+
+
+
+
+
         #self.matrix.SwapOnVSync(canvas)
         #canvas.Clear()
 
@@ -157,14 +152,40 @@ class GraphicsTest(SampleBase):
         for subpacket in self.packet:
             canvas.Clear()
 
-            print(f"Station Call: {statnum} ({self.station_names[statnum]})")
+            #EASTER EGG BLOCK
+    #        now = datetime.now()
+     #       print(f"____________Now.hour = {now.hour}, now.minute = {now.minute}, now.second = {now.second}")
+#
+ #           print(f"    -- calling: EasterEgg")
+  #          print(f"easter egg! easter egg! easter egg! easter egg!")
+   #         roomate_list = ("Spencer", "Tiff", "Paul", "Ergo", "Dolly", "Buddy")
+    #        roomate = random.choice(roomate_list)
+     #       print(f"I LOVE YOU {roomate}")
+      #      t_end1 = time.time() + 4
+       #     canvas.Fill(0, 255, 0)
+
+            #hile time.time() < t_end1 and now.hour==20 and 55 <= now.minute <=57:
+                # print(f"in here")
+                # print(f" time.time() < time.time() + 10  |  {str(time.time())} < {str(time.time()+10)}")
+            #    canvas.Clear()
+            #    canvas.Fill(0, 255, 0)
+            #    graphics.DrawText(canvas, font_big, 9, 6, white, "I LOVE YOU " + roomate)
+                #                 str(self.station_names[0]) + " " + str(self.stations[0])[0] + " Train")
+
+                # Why is this not printing anything on the matrix????????????????????
+
+                # graphics.DrawText(canvas, font, 25, 14, white, "I LOVE YOU " + roomate)
+                # time.sleep(5)
+            #    canvas.Clear()
+
+            print(f"Station Call: [{statnum}] {self.station_names[statnum]} ({str(self.stations[statnum])[0]} train)")
             c+=1
 
 
 
             northhvalues=[[0, 30],[0,30]]
             southhvalues=[[0, 30],[0,30]]
-            t_end = time.time() + 12  #last value controls display time per station in seconds
+            t_end = time.time() + 4  #last value controls display time per station in seconds
             # ^ do it like: if there are three stations (statins[0,1,2], then make the interval variable much higher, so it only shows station name
             #at the end of each "cycle", instead of at the end of each line list. That way it goes like:
             # 456 times, nqrw times, L times, then "14 st-Union Sq", instead of the station name after each card.
@@ -177,7 +198,7 @@ class GraphicsTest(SampleBase):
 
             while time.time() < t_end:
                 canvas.Clear()
-                graphics.DrawText(canvas, font_small, 9, 6, white, str(self.station_names[statnum]) + " " + str(line) + " Train")
+                graphics.DrawText(canvas, font_small, 9, 6, white, str(self.station_names[statnum]) + " " + str(self.stations[statnum])[0] + " Train")
                 #utc = pytz.timezone('UTC')
                 #now = utc.localize(datetime.utcnow())
                 #nytz =pytz.timezone('America/New_York')
@@ -383,12 +404,8 @@ class GraphicsTest(SampleBase):
                 time.sleep(0.01) #this makes the running text easier to read.
                 canvas = self.matrix.SwapOnVSync(canvas) #turning this off makes the whole thing black forever? Weird.
                 i +=1
-            statnum+=1
-
             if c<3: #wtf is "c"??
                 print("sleeping...")
-
-            #THIS IS train disruption functionality that I don't care about.
             elif c==3:
                 canvas.Clear()
                 graphics.DrawText(canvas, font, 0, 8, white, "Disruptions:")
@@ -410,7 +427,27 @@ class GraphicsTest(SampleBase):
                     ipaddr2="IP: " + ipaddr[:-3]
                     graphics.DrawText(canvas, font, 0, 32, graphics.Color(10,169,172), ipaddr2)
                 canvas = self.matrix.SwapOnVSync(canvas)
-            #else:
-            print("fetching data")
-            #canvas = self.matrix.SwapOnVSync(canvas)
+           # if 25 <= now.minute <= 31:
+               # t_end1 = time.time()+20
+                #while time.time() < t_end1:
+                    #print("waking....")
+                  #  print(f"now.minute: {now.minute}")
+                    #canvas.Clear()
+                   # canvas.Fill(100,100,100)
+                 #   graphics.DrawText(canvas, font_big, 9, 6,blue, "I LOVE YOU!")
+
+                  #  canvas.Clear()
+
+
+
+
+
+
+            statnum+=1
+
+
+
+
+    def print_help(self):
+        pass
 
