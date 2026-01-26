@@ -150,6 +150,7 @@ class GraphicsTest(SampleBase):
 
 
         for subpacket in self.packet:
+            print(f"subpacket: {subpacket}")
             canvas.Clear()
 
             #EASTER EGG BLOCK
@@ -185,7 +186,7 @@ class GraphicsTest(SampleBase):
 
             northhvalues=[[0, 30],[0,30]]
             southhvalues=[[0, 30],[0,30]]
-            t_end = time.time() + 4  #last value controls display time per station in seconds
+            t_end = time.time() + 25  #last value controls display time per station in seconds
             # ^ do it like: if there are three stations (statins[0,1,2], then make the interval variable much higher, so it only shows station name
             #at the end of each "cycle", instead of at the end of each line list. That way it goes like:
             # 456 times, nqrw times, L times, then "14 st-Union Sq", instead of the station name after each card.
@@ -217,7 +218,15 @@ class GraphicsTest(SampleBase):
                     mins = str(train[1])
                     dest = str(stops[train[2]])
 
-                    if train[2][3] == "N":
+                    if line =="J": #or line == "M":
+                        directionN = "S"
+                        directionS = "N"
+                    else:
+                        directionN = "N"
+                        directionS = "S"
+                    #print(f"train: {train}")
+
+                    if train[2][3] == directionN:
                         if b<2:
                             color=self.getcolor(line)
                             traincolors.append(color)
@@ -324,7 +333,14 @@ class GraphicsTest(SampleBase):
                     line = str(train[0])
                     dest = str(stops[train[2]])
                     mins = str(train[1])
-                    if train[2][3] == "S":
+                    if line =="J": #or line == "M":
+                        directionN = "S"
+                        directionS = "N"
+                    else:
+                        directionN = "N"
+                        directionS = "S"
+
+                    if train[2][3] == directionS:
                         if b<1:
                             #fetch bullet/line color
                             color=self.getcolor(line)
@@ -443,7 +459,10 @@ class GraphicsTest(SampleBase):
 
 
 
+
             statnum+=1
+        canvas = self.matrix.SwapOnVSync(canvas)
+        print("canvas = self.matrix.SwapOnVSync(canvas)")
 
 
 

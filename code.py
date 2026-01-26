@@ -1,12 +1,11 @@
 import datetime
-from sched import scheduler
+import microcontroller
 
-import google.transit
-import schedule
+
 from google.transit import gtfs_realtime_pb2
 import requests
 import time  # imports module for Epoch/GMT time conversion
-import os  # imports package for dotenv
+from os import getenv
 from protobuf_to_dict import protobuf_to_dict
 import subprocess
 import csv
@@ -20,6 +19,17 @@ from RGBMatrixEmulator import graphics
 from rundisplay import GraphicsTest
 import easteregg
 
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
+
+#if None in [ssid, password]:
+#    raise RuntimeError(
+#        "WiFi settings are kept in settings.toml, "
+##        "please add them there. The settings file must contain "
+ #       "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
+ #       "at a minimum."
+ #   )
 
 def getdata():
     realtime_data1 = []
@@ -239,17 +249,14 @@ def rgbformatter(packet, servicedata, stations):
 
                     print(f"({line})  | {dest:<25}    {mins:>15}")
                     b += 1
-def eastereggfunc():
-    easteregg()
-    for i in range(14):
-        print("lol")
+
 
 ## TEMPORARY::
 while True:
     if __name__ == "__main__":
         now = datetime.datetime.now()
         print(f"now: {now.hour}:{now.minute}:{now.second}")
-        stations = ["M12"] #, "G31", "L13"] #["A32", "D20"] #W 4th St
+        stations = ["M12", "G31", "L13"] #["A32", "D20"] #W 4th St
                                 # #for some reason, L12 and L13 don't work? No packet data?
                             #"R16", "127", "725", "901"] TIMES SQUARE
                         # #"M12", "G31", "L13"] SPENCER AND TIFFS HOUSE
@@ -284,13 +291,12 @@ while True:
                 graphics_test.print_help()
 
             #easter egg schedule
-            easter_egg = EasterEgg()
-            if now.hour == 22 and 1 <= now.minute <= 59:
-                print(f"now.hour: {now.hour}, now.minute: {now.minute}")
-                if not easter_egg.process():
-                    print("In here")
-                    easter_egg.print_help()
 
+            if now.hour == 00 and (1 <= now.minute <= 3 or 55 <now.minute <= 57):
+                print(f"now.hour: {now.hour}, now.minute: {now.minute}")
+                easter_egg = EasterEgg()
+                if (not EasterEgg().process()):
+                    easteregg.print_help()
 
     for timegroup in packet:
         for singletime in timegroup:
