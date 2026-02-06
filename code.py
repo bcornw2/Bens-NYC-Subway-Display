@@ -9,27 +9,20 @@ from os import getenv
 from protobuf_to_dict import protobuf_to_dict
 import subprocess
 import csv
-from termcolor import colored, cprint
+
 
 import rundisplay
 from easteregg import EasterEgg
 from rundisplay import GraphicsTest
+from digitalio import DigitalInOut
+import board
+
 
 from RGBMatrixEmulator import graphics
 from rundisplay import GraphicsTest
 import easteregg
 
-# Get WiFi details, ensure these are setup in settings.toml
-ssid = getenv("CIRCUITPY_WIFI_SSID")
-password = getenv("CIRCUITPY_WIFI_PASSWORD")
 
-#if None in [ssid, password]:
-#    raise RuntimeError(
-#        "WiFi settings are kept in settings.toml, "
-##        "please add them there. The settings file must contain "
- #       "'CIRCUITPY_WIFI_SSID', 'CIRCUITPY_WIFI_PASSWORD', "
- #       "at a minimum."
- #   )
 
 def getdata():
     realtime_data1 = []
