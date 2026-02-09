@@ -2,7 +2,8 @@
 import time
 import sys
 
-from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
+#from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
 from PIL import Image
 #image_file = "~/Downloads/odai8.gif"
 #im = sys.stdin.readline()

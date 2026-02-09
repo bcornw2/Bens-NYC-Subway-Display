@@ -4,7 +4,8 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
-from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
+#from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
 
 
 class SampleBase(object):
@@ -13,7 +14,7 @@ class SampleBase(object):
 
         self.parser.add_argument("-r", "--led-rows", action="store", help="Display rows. 16 for 16x32, 32 for 32x32. Default: 32", default=32, type=int) #default was 32
         self.parser.add_argument("--led-cols", action="store", help="Panel columns. Typically 32 or 64. (Default: 32)", default=64, type=int) #DEFAULT CHANGED FROM 32
-        self.parser.add_argument("-c", "--led-chain", action="store", help="Daisy-chained boards. Default: 1.", default=2, type=int)
+        self.parser.add_argument("-c", "--led-chain", action="store", help="Daisy-chained boards. Default: 1.", default=1, type=int)
         self.parser.add_argument("-P", "--led-parallel", action="store", help="For Plus-models or RPi2: parallel chains. 1..3. Default: 1", default=1, type=int)
         self.parser.add_argument("-p", "--led-pwm-bits", action="store", help="Bits used for PWM. Something between 1..11. Default: 11", default=11, type=int)
         self.parser.add_argument("-b", "--led-brightness", action="store", help="Sets brightness level. Default: 100. Range: 1..100", default=100, type=int)

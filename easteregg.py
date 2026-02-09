@@ -2,13 +2,15 @@
 import random
 import sys
 from random import randint
+import certifi.core
 
 from PIL import Image
 
 #from mtaapicall import eastereggfunc
 from samplebase import SampleBase
 import time
-from RGBMatrixEmulator import graphics, RGBMatrixOptions, RGBMatrix
+from rgbmatrix import graphics, RGBMatrixOptions, RGBMatrix
+#from RGBMatrixEmulator import graphics, RGBMatrixOptions, RGBMatrix
 
 # Configuration for the matrix
 #options = RGBMatrixOptions()

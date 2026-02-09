@@ -2,26 +2,27 @@
 import random
 from datetime import datetime
 
-import RGBMatrixEmulator
+import rgbmatrix
+#import RGBMatrixEmulator
 from PIL import Image
 
 #CLOCK
-from pytz import timezone
-import adafruit_ntp
+#from pytz import timezone
+#import adafruit_ntp
 
 #Adafruit
-import adafruit_connection_manager
+#import adafruit_connection_manager
 
-#import rgbmatrix
-from RGBMatrixEmulator import graphics
-from sympy.parsing.sympy_parser import null
+from rgbmatrix import graphics
+#from RGBMatrixEmulator import graphics
+#from sympy.parsing.sympy_parser import null
 
 import easteregg
 from easteregg import EasterEgg
 from samplebase import SampleBase
 
-from subprocess import check_output
-import subprocess
+#from subprocess import check_output
+#import subprocess
 import csv
 import time
 #import wifi
@@ -32,8 +33,8 @@ import os
 
 #init
 #wifi
-wifi_ssid = os.getenv("cxxxx{|::::::::::::::::::::::::/")
-wifi_password = os.getenv("thesword")
+   #wifi_ssid = os.getenv("cxxxx{|::::::::::::::::::::::::/")
+   #wifi_password = os.getenv("thesword")
 #radio = wifi.radio
 #print(radio.enabled)
 #wifi.radio.connect(wifi_ssid, wifi_password)
@@ -148,7 +149,7 @@ class GraphicsTest(SampleBase):
         statnum = 0
         c=0 #what are you????
 
-
+        print(f"Packet Total:  {self.packet}")
         for subpacket in self.packet:
             print(f"subpacket: {subpacket}")
             canvas.Clear()
@@ -345,6 +346,7 @@ class GraphicsTest(SampleBase):
                             #fetch bullet/line color
                             color=self.getcolor(line)
                             bulletcolor=white
+                            if line=="N" or line=="R" or line=="Q" or line=="W": bulletcolor = black
 
                             #compressing/running the too-long dest names
                             len2=(len(str(dest))*5) #as 5 is the width if pixels per letter, this line shows how wide the destination is.

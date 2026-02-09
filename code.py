@@ -1,5 +1,6 @@
 import datetime
-import microcontroller
+#import microcontroller
+import certifi.core
 
 
 from google.transit import gtfs_realtime_pb2
@@ -7,18 +8,18 @@ import requests
 import time  # imports module for Epoch/GMT time conversion
 from os import getenv
 from protobuf_to_dict import protobuf_to_dict
-import subprocess
+#import subprocess
 import csv
 
 
 import rundisplay
 from easteregg import EasterEgg
 from rundisplay import GraphicsTest
-from digitalio import DigitalInOut
-import board
+#from digitalio import DigitalInOut
+#import board
 
-
-from RGBMatrixEmulator import graphics
+from rgbmatrix import graphics
+#from RGBMatrixEmulator import graphics
 from rundisplay import GraphicsTest
 import easteregg
 
@@ -249,7 +250,7 @@ while True:
     if __name__ == "__main__":
         now = datetime.datetime.now()
         print(f"now: {now.hour}:{now.minute}:{now.second}")
-        stations = ["M12", "G31", "L13"] #["A32", "D20"] #W 4th St
+        stations = ["M12", "G31", "L13"]#, "L13"] #["A32", "D20"] #W 4th St
                                 # #for some reason, L12 and L13 don't work? No packet data?
                             #"R16", "127", "725", "901"] TIMES SQUARE
                         # #"M12", "G31", "L13"] SPENCER AND TIFFS HOUSE
@@ -285,7 +286,7 @@ while True:
 
             #easter egg schedule
 
-            if now.hour == 00 and (1 <= now.minute <= 3 or 55 <now.minute <= 57):
+            if now.hour == 11 and (1 <= now.minute <= 59 or 50 <now.minute <= 59):
                 print(f"now.hour: {now.hour}, now.minute: {now.minute}")
                 easter_egg = EasterEgg()
                 if (not EasterEgg().process()):
